@@ -1,0 +1,37 @@
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    admin:
+      properties:
+        bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        acks: all
+        retries: 3
+    consumer:
+      group-id: user-email-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  mail:
+    host: smtp.yandex.ru
+    port: 587
+    username: javamodule-noreply@
+    password: j@vamodule1
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            trust: smtp.yandex.ru
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+logging:
+  level:
+    org.springframework.kafka: DEBUG

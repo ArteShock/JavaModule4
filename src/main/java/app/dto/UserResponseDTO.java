@@ -12,7 +12,6 @@ public class UserResponseDTO {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
-    // Конструкторы
     public UserResponseDTO() {}
 
     public UserResponseDTO(int id, String name, String email, int age, LocalDateTime createdAt) {
@@ -23,7 +22,6 @@ public class UserResponseDTO {
         this.createdAt = createdAt;
     }
 
-    // Геттеры и сеттеры
     public int getId() {
         return id;
     }

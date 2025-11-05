@@ -21,7 +21,6 @@ public class UserRequestDTO {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
-    // Конструкторы
     public UserRequestDTO() {}
 
     public UserRequestDTO(String name, String email, int age, LocalDateTime createdAt) {
@@ -31,7 +30,6 @@ public class UserRequestDTO {
         this.createdAt = createdAt;
     }
 
-    // Геттеры и сеттеры
     public String getName() {
         return name;
     }

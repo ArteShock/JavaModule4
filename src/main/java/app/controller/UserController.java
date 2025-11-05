@@ -2,6 +2,7 @@ package app.controller;
 
 import app.dto.UserRequestDTO;
 import app.dto.UserResponseDTO;
+import app.entity.User;
 import app.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +68,8 @@ public class UserController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable int id) {
         try {
-            userService.deleteUser(id);
+            UserResponseDTO user = userService.getUserById(id);
+            userService.deleteUser(user);
             return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
