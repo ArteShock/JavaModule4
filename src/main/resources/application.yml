@@ -18,8 +18,8 @@ spring:
   mail:
     host: smtp.yandex.ru
     port: 587
-    username: javamodule-noreply@
-    password: j@vamodule1
+    username: javamodule-noreply@yandex.ru
+    password: skdjvnxkmfimkwkg
     protocol: smtp
     properties:
       mail:

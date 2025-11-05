@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Service;
 
+@Service
 public class EmailConsumer {
 
     private final JavaMailSender mailSender;
@@ -35,7 +37,7 @@ public class EmailConsumer {
             message.setTo(emailMessage.getTo());
             message.setSubject(emailMessage.getSubject());
             message.setText(emailMessage.getBody());
-            message.setFrom("noreply@myapp.com");
+            message.setFrom("javamodule-noreply@yandex.ru");
 
             mailSender.send(message);
 
