@@ -2,79 +2,92 @@ package app.controller;
 
 import app.dto.UserRequestDTO;
 import app.dto.UserResponseDTO;
-import app.entity.User;
 import app.service.UserService;
-import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api")
+@Tag(name = "User Management", description = "API для управления пользователями")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
-    @GetMapping
+    @GetMapping("/users")
+    @Operation(summary = "Получить всех пользователей", description = "Возвращает список всех пользователей в системе")
+    @ApiResponse(responseCode = "200", description = "Успешный ответ")
     public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
         try {
             List<UserResponseDTO> users = userService.getAllUsers();
             return ResponseEntity.ok(users);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.internalServerError().build();
         }
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable int id) {
-        try {
-            UserResponseDTO user = userService.getUserById(id);
-            return ResponseEntity.ok(user);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @PostMapping
-    public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserRequestDTO userDTO) {
+    @PostMapping("/users")
+    @Operation(summary = "Создать нового пользователя", description = "Создает нового пользователя и отправляет email уведомление")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Пользователь создан"),
+            @ApiResponse(responseCode = "400", description = "Неверные данные или email уже существует")
+    })
+    public ResponseEntity<?> createUser(@RequestBody UserRequestDTO userDTO) {
         try {
             UserResponseDTO createdUser = userService.createUser(userDTO);
             return ResponseEntity.ok(createdUser);
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.internalServerError().body("Ошибка при создании пользователя");
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable int id, @Valid @RequestBody UserRequestDTO userDTO) {
+    @DeleteMapping("/users/{id}")
+    @Operation(summary = "Удалить пользователя", description = "Удаляет пользователя по ID и отправляет email уведомление")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Пользователь удален"),
+            @ApiResponse(responseCode = "404", description = "Пользователь не найден")
+    })
+    public ResponseEntity<?> deleteUser(
+            @Parameter(description = "ID пользователя", example = "1")
+            @PathVariable int id) {
         try {
-            UserResponseDTO updatedUser = userService.updateUser(id, userDTO);
+            UserResponseDTO user = userService.getUserById(id);
+            userService.deleteUser(user);
+            return ResponseEntity.ok().body("Пользователь успешно удален");
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Ошибка при удалении пользователя");
+        }
+    }
+
+    @PatchMapping("/users/{id}/name")
+    @Operation(summary = "Обновить имя пользователя", description = "Обновляет только имя пользователя")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Имя обновлено"),
+            @ApiResponse(responseCode = "404", description = "Пользователь не найден")
+    })
+    public ResponseEntity<?> updateUserName(
+            @Parameter(description = "ID пользователя") @PathVariable int id,
+            @Parameter(description = "Новое имя", example = "Иван Иванов")
+            @RequestParam String name) {
+        try {
+            UserResponseDTO updatedUser = userService.updateUserName(id, name);
             return ResponseEntity.ok(updatedUser);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable int id) {
-        try {
-            UserResponseDTO user = userService.getUserById(id);
-            userService.deleteUser(user);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.internalServerError().body("Ошибка при обновлении имени");
         }
     }
 }
